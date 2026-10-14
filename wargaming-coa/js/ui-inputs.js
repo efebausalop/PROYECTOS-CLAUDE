@@ -37,8 +37,8 @@
         card(t('Limitaciones'), `<label class="fl">${t('Obligaciones (debe hacer)')}</label>${fTa(P + 's13.constraints', 4)}<label class="fl">${t('Prohibiciones (no debe hacer)')}</label>${fTa(P + 's13.restraints', 4)}`, 'red') +
         card(t('Deducciones clave'), fTa(P + 's13.deductions', 5)) +
         card(t('COA propias a analizar (producto del paso 3)'),
-          o.coas.map((c, i) => `<div class="itembox"><div class="row nowrap"><input class="in idf" data-b="coas.${i}.id" data-re="self" value="${esc(c.id)}" aria-label="ID">${fIn('coas.' + i + '.name', t('Nombre de la COA'))}<button class="btn ghost sm" data-a="delCoa" data-i="${i}" aria-label="${t('Eliminar')}">✕</button></div>${fTa('coas.' + i + '.stmt', 3, t('Enunciado de la COA…'))}</div>`).join('') +
-          `<div class="row"><button class="btn pri sm" data-a="addCoa">＋ ${t('Añadir COA')}</button><button class="btn sm" data-a="dupCoa">⧉ ${t('Duplicar COA seleccionada con su plan')}</button></div>`, 'gold') +
+          o.coas.map((c, i) => `<div class="itembox"><div class="row nowrap"><input class="in idf" data-b="coas.${i}.id" data-re="self" value="${esc(c.id)}" aria-label="ID">${fIn('coas.' + i + '.name', t('Nombre de la COA'))}${global.WGAI ? `<button class="btn ghost sm" data-a="aiOpen" data-k="coaPlan" data-coa="${esc(c.id)}" title="${t('Interpretar con IA')}" aria-label="${t('Interpretar con IA')}">✦</button>` : ''}<button class="btn ghost sm" data-a="delCoa" data-i="${i}" aria-label="${t('Eliminar')}">✕</button></div>${fTa('coas.' + i + '.stmt', 3, t('Enunciado de la COA…'))}</div>`).join('') +
+          `<div class="row"><button class="btn pri sm" data-a="addCoa">＋ ${t('Añadir COA')}</button><button class="btn sm" data-a="dupCoa">⧉ ${t('Duplicar COA seleccionada con su plan')}</button>${global.WGAI ? `<button class="btn sm" data-a="aiOpen" data-k="coaDraft">✦ ${t('Redactar COA con IA')}</button>` : ''}</div>`, 'gold') +
         `</div></div>`;
     } else if (tab === 'est') {
       const cnt = s => o.inputs.est.filter(e => e.status === s).length;
@@ -62,8 +62,8 @@
            <div class="g2 tight"><div><label class="fl">${t('Clasificación IPOE')}</label>${fSel('ecoas.' + i + '.tag', [['MLCOA', t('MLCOA — más probable')], ['MDCOA', t('MDCOA — más peligrosa')], ['', t('Otra')]], 'self')}</div><div><label class="fl">${t('Probabilidad estimada (%)')}</label>${fNum('ecoas.' + i + '.lik', 'min="0" max="100" step="5"')}</div></div>
            <label class="fl">${t('Descripción')}</label>${fTa('ecoas.' + i + '.text', 5)}
            <div class="g2 tight">${o.sectors.map(s => `<div><label class="fl">${esc(s.name)}</label>${fTa('ecoas.' + i + '.bySector.' + s.id, 3)}</div>`).join('')}</div>`,
-          'red', `<button class="btn ghost sm" data-a="delEcoa" data-i="${i}" aria-label="${t('Eliminar')}">✕</button>`)).join('') + `</div>` +
-        `<div class="row"><button class="btn pri sm" data-a="addEcoa">＋ ${t('Añadir COA enemiga')}</button><span class="muted small">${t('El despliegue por turnos de cada COA enemiga se define en «Planes COA / ECOA».')}</span></div>` +
+          'red', `${global.WGAI ? `<button class="btn ghost sm" data-a="aiOpen" data-k="ecoaPlan" data-ecoa="${esc(c.id)}" title="${t('Interpretar con IA')}" aria-label="${t('Interpretar con IA')}">✦</button>` : ''}<button class="btn ghost sm" data-a="delEcoa" data-i="${i}" aria-label="${t('Eliminar')}">✕</button>`)).join('') + `</div>` +
+        `<div class="row"><button class="btn pri sm" data-a="addEcoa">＋ ${t('Añadir COA enemiga')}</button>${global.WGAI ? `<button class="btn sm" data-a="aiOpen" data-k="ecoaDraft">✦ ${t('Redactar COA enemiga con IA')}</button>` : ''}<span class="muted small">${t('El despliegue por turnos de cada COA enemiga se define en «Planes COA / ECOA».')}</span></div>` +
         card(t('Puntos de decisión enemigos (del registro de DP)'),
           `<div class="tw"><table class="t ro"><thead><tr><th>DP</th><th>${t('Decisión enemiga')}</th><th>${t('Indicador')}</th><th>NAI</th><th>CCIR</th></tr></thead><tbody>${o.reg.dp.filter(d => d.side === 'RED').map(d => `<tr><td><b>${esc(d.id)}</b></td><td>${esc(d.dec)}</td><td>${esc(d.trg)}</td><td>${esc(d.nai)}</td><td>${esc(d.ccir)}</td></tr>`).join('') || `<tr><td colspan="5" class="muted">${t('Sin DP enemigos registrados.')}</td></tr>`}</tbody></table></div>`, 'red');
     }
@@ -74,11 +74,12 @@
     const examples = Object.keys(SC).map(k => `<button class="btn sm" data-a="loadEx" data-k="${k}">⤓ ${esc(SC[k].name)}</button>`).join('');
     return `<div class="g2"><div>` +
       card(t('Operaciones'), `<p class="muted small">${t('Puede trabajar con varias operaciones; cada una guarda sus COA, ECOA, ORBAT y confrontaciones. Se conservan en este navegador: exporte el JSON para compartirlas.')}</p>
-        <div class="row"><button class="btn pri sm" data-a="newOp">＋ ${t('Nueva operación en blanco')}</button><button class="btn sm" data-a="dupOp">⧉ ${t('Duplicar')}</button><button class="btn sm danger" data-a="delOp">✕ ${t('Eliminar')}</button></div>
+        <div class="row"><button class="btn pri sm" data-a="newOpWiz">＋ ${t('Nueva operación')}</button>${global.WGAI ? `<button class="btn sm" data-a="aiOpen" data-k="doc">✦ ${t('Desde un documento (IA)')}</button>` : ''}<button class="btn sm" data-a="dupOp">⧉ ${t('Duplicar')}</button><button class="btn sm danger" data-a="delOp">✕ ${t('Eliminar')}</button></div>
         <label class="fl">${t('Cargar escenario de ejemplo')}</label><div class="row">${examples}</div>
         <label class="fl">${t('Importar / exportar')}</label><div class="row"><button class="btn sm" data-a="importOpen">⬆ ${t('Importar JSON (v3 o copia de wargaming_nato v2)')}</button><button class="btn sm" data-a="exportOp">⬇ ${t('Exportar esta operación')}</button><button class="btn sm" data-a="exportAll">⬇ ${t('Copia completa')}</button></div>`, 'gold') +
       card(t('Identificación'), `<label class="fl">${t('Título')}</label>${fIn('meta.title', '', '', '', 'self')}
         <div class="g2 tight"><div><label class="fl">${t('Clasificación')}</label>${fIn('meta.classification')}</div><div><label class="fl">${t('Etiqueta corta')}</label>${fIn('meta.tag')}</div></div>
+        <label class="fl">${t('Tipo de operación')}</label>${fSel('opType', [['', '—']].concat(Object.keys(global.WGTemplates.LIST).map(k => [k, t(global.WGTemplates.LIST[k].l)])))}
         <label class="fl">${t('Unidad que planea')}</label>${fIn('meta.unit')}
         <div class="g2 tight"><div><label class="fl">${t('Sindicato / equipo')}</label>${fIn('meta.syndicate')}</div><div><label class="fl">${t('Fecha')}</label>${fIn('meta.date')}</div></div>
         <div class="g2 tight"><div><label class="fl">${t('Umbral FFIR-1 (% potencia de combate)')}</label>${fNum('ffir', 'min="0" max="100"')}</div><div><label class="fl">${t('Línea de referencia de la DC (%)')}</label>${fNum('dcLine', 'min="0" max="100"')}</div></div>`) +
@@ -133,7 +134,7 @@
     }
     const cnt = s => { const r = o.orbat.filter(x => x.side === s); return `${r.filter(x => x.ech === 'company').length} ${t('cías')} · ${r.filter(x => x.ech === 'battalion').length} ${t('bones')} · ${r.length} ${t('unidades')}`; };
     let h = secH(t('ORBAT — orden de batalla hasta compañía'), t('Simbología APP-6, editable. La potencia de combate y el tipo de F.E. alimentan el motor de cálculo, la correlación de fuerzas y la confrontación.'),
-      `<button class="btn sm" data-a="orbx" data-v="1">${t('Desplegar todo')}</button><button class="btn sm" data-a="orbx" data-v="0">${t('Plegar todo')}</button><button class="btn pri sm" data-a="uadd" data-id="">＋ ${t('Unidad de nivel superior')}</button>`);
+      `<button class="btn sm" data-a="orbx" data-v="1">${t('Desplegar todo')}</button><button class="btn sm" data-a="orbx" data-v="0">${t('Plegar todo')}</button><button class="btn sm" data-a="orbPaste">⇪ ${t('Pegar ORBAT (CSV / tabla)')}</button><button class="btn pri sm" data-a="uadd" data-id="">＋ ${t('Unidad de nivel superior')}</button>`);
     h += `<div class="row">${pills([['ALL', t('Ambos bandos')], ['B', t('Propias')], ['R', t('Adversarias')]], side, 'uitab', 'orbSide')}
       <input class="in" style="max-width:280px" placeholder="🔎 ${t('Buscar unidad, material, cometido…')}" value="${esc(o.ui.q || '')}" data-b="ui.q" data-live="orbq" aria-label="${t('Buscar')}">
       <span class="muted small">${t('Azul')}: ${cnt('B')} · ${t('Rojo')}: ${cnt('R')}</span></div>`;
@@ -245,12 +246,12 @@
            <div class="g3 tight">${Object.keys(cfg.mods).map(k => { const md = cfg.mods[k]; return `<div><label class="fl">${t(md.label)}</label>${fSel(xb + '.mods.' + k, md.opts.map((op_, i) => [i, t(op_[0]) + ' ×' + op_[1]]), 'self')}</div>`; }).join('')}
            <div><label class="fl">${t('Combinación de misiones (tabla BCTP)')}</label>${fSel(xb + '.pair', pairOpts, 'self')}</div></div></details>
        </div>`; }).join('')}
-       <div class="row"><button class="btn pri sm" data-a="addEng" data-p="${bp}.eng">＋ ${t('Añadir enfrentamiento')}</button>${ti > 0 ? `<button class="btn sm" data-a="copyPrev" data-side="coa" data-from="${esc(o.turns[ti - 1].id)}">⧉ ${t('Copiar del turno anterior')}</button>` : ''}</div>`, 'blue');
+       <div class="row"><button class="btn pri sm" data-a="addEng" data-p="${bp}.eng">＋ ${t('Añadir enfrentamiento')}</button>${ti > 0 ? `<button class="btn sm" data-a="copyPrev" data-side="coa" data-from="${esc(o.turns[ti - 1].id)}">⧉ ${t('Copiar del turno anterior')}</button>` : ''}</div>`, 'blue', (global.WGAI ? `<button class="btn sm" data-a="aiOpen" data-k="coaPlan" data-coa="${esc(c.id)}">✦ ${t('Interpretar con IA')}</button>` : ''));
     const red = card(`<span class="side-r">RED</span> ${esc(e.name)}`,
       `<div class="g2 tight"><div><label class="fl">${t('Pre-acción roja')}</label>${fTa(rp + '.pre', 3)}</div><div><label class="fl">${t('Reacción roja')}</label>${fTa(rp + '.r', 3)}</div></div>
        <span class="fl">${t('Despliegue rojo en contacto (unidad · sector · % empeñado)')}</span>
        ${e.plan[tid].place.map((pp, k) => `<div class="urow place">${fSel(rp + '.place.' + k + '.u', O.fight('R'), 'self')}${fSel(rp + '.place.' + k + '.sector', O.sectors(), 'self')}${fNum(rp + '.place.' + k + '.pct', 'min="0" max="100" step="5" aria-label="%"')}<button class="btn ghost sm" data-a="delRow" data-p="${rp}.place" data-i="${k}" aria-label="${t('Quitar')}">✕</button></div>`).join('')}
-       <div class="row"><button class="btn pri sm" data-a="addRow" data-p="${rp}.place" data-kind="place">＋ ${t('Unidad')}</button>${ti > 0 ? `<button class="btn sm" data-a="copyPrev" data-side="ecoa" data-from="${esc(o.turns[ti - 1].id)}">⧉ ${t('Copiar del turno anterior')}</button>` : ''}</div>`, 'red');
+       <div class="row"><button class="btn pri sm" data-a="addRow" data-p="${rp}.place" data-kind="place">＋ ${t('Unidad')}</button>${ti > 0 ? `<button class="btn sm" data-a="copyPrev" data-side="ecoa" data-from="${esc(o.turns[ti - 1].id)}">⧉ ${t('Copiar del turno anterior')}</button>` : ''}</div>`, 'red', (global.WGAI ? `<button class="btn sm" data-a="aiOpen" data-k="ecoaPlan" data-ecoa="${esc(e.id)}">✦ ${t('Interpretar con IA')}</button>` : ''));
     h += `<div class="g2">${blue}${red}</div>`;
     const path = U.pathFor(c, e, W.game(o, null, false));
     const T = path && path.turns.find(x => x.t.id === tid);
@@ -332,5 +333,50 @@
       if (d.side === 'coa') { const c = U.coa(); const src = (c.plan[d.from] || {}).eng || []; c.plan[tid].eng = W.clone(src).map(x => Object.assign(x, { id: 'e' + Math.random().toString(36).slice(2, 8) })); }
       else { const e = U.ecoa(); e.plan[tid].place = W.clone((e.plan[d.from] || {}).place || []); }
       U.save(true); U.render(); U.toast(t('Copiado del turno anterior')); }
+  });
+
+  /* ------------------------------ asistente de nueva operación ------------------------------ */
+  const TPL = () => global.WGTemplates;
+  const wiz = { k: 'delibAtk', name: '' };
+  const orbP = { text: '', mode: 'add', res: null };
+  function modal(html) { const m = U.$('modal'), b = U.$('mbox'); b.className = 'box wide'; b.innerHTML = '<div class="mb">' + html + '</div>'; m.hidden = false; m.classList.add('on'); }
+  function drawWiz() {
+    const L = TPL().LIST;
+    modal(`<div class="row between"><h3>${t('Nueva operación')}</h3><button class="btn ghost sm" data-a="mclose" aria-label="${t('Cerrar')}">✕</button></div>
+      <p class="small muted">${t('Elija el tipo de operación terrestre táctica. La plantilla prepara fases, sectores, métodos, turnos, eventos críticos, criterios, CCIR y supuestos tipo; después los adapta o los importa de su documento con la IA.')}</p>
+      <div class="tplg">${Object.keys(L).map(k => `<button class="tpl ${wiz.k === k ? 'on' : ''}" data-a="wizK" data-k="${k}" aria-pressed="${wiz.k === k}"><b>${esc(t(L[k].l))}</b><span>${esc(t(L[k].d))}</span><span class="muted">${L[k].turns.length} ${t('turnos')} · ${L[k].sectors.length} ${t('sectores')}</span></button>`).join('')}</div>
+      <label class="fl">${t('Nombre de la operación')}</label><input class="in" data-live="wizName" value="${esc(wiz.name)}" placeholder="${esc(t('p. ej. Operación HALCÓN'))}">
+      <div class="row end"><button class="btn" data-a="mclose">${t('Cancelar')}</button><button class="btn pri" data-a="wizGo">＋ ${t('Crear')}</button></div>`);
+  }
+  U.live.wizName = el => { wiz.name = el.value; };
+  U.live.orbText = el => { orbP.text = el.value; orbP.res = null; const b = document.querySelector('[data-a="orbApply"]'); if (b) b.disabled = true; };
+  function drawOrb() {
+    const r = orbP.res;
+    modal(`<div class="row between"><h3>${t('Pegar ORBAT')}</h3><button class="btn ghost sm" data-a="mclose" aria-label="${t('Cerrar')}">✕</button></div>
+      <p class="small muted">${t('Pegue una tabla desde Excel, Word o CSV. Con cabecera, las columnas se reconocen por su nombre (id, bando, nombre, escalón, tipo, superior, FE o tipo F.E., cantidad, CP, personal, material, cometido). Sin cabecera, el orden es: id · bando (B/R) · nombre · escalón · tipo · superior · F.E. · CP · cometido.')}</p>
+      <textarea class="ta mono" rows="9" data-live="orbText" placeholder="id;bando;nombre;escalon;tipo;superior;fe;cp;cometido&#10;b1;B;1.er Batallón;battalion;mech;;Infantry Bn (M2);100;Esfuerzo principal">${esc(orbP.text)}</textarea>
+      <div class="row"><label class="chk"><input type="radio" name="orbm" data-ch="orbMode" value="add"${orbP.mode === 'add' ? ' checked' : ''}><span>${t('Añadir al ORBAT actual')}</span></label><label class="chk"><input type="radio" name="orbm" data-ch="orbMode" value="rep"${orbP.mode === 'rep' ? ' checked' : ''}><span>${t('Sustituir el ORBAT (borra planes y confrontaciones)')}</span></label></div>
+      ${r ? `<p class="small"><b>${r.units.length}</b> ${t('unidades')} · ${t('Azul')} ${r.units.filter(u => u.side === 'B').length} · ${t('Rojo')} ${r.units.filter(u => u.side === 'R').length} · ${t('con F.E.')} ${r.units.filter(u => u.frT).length}</p>${r.warn.length ? `<details class="warnbox"><summary>${t('{n} avisos de validación', { n: r.warn.length })}</summary><ul class="small rl">${r.warn.slice(0, 30).map(w => `<li>${esc(w)}</li>`).join('')}</ul></details>` : ''}` : ''}
+      <p class="small muted">${t('Escalones')}: ${C.ECHO.join(', ')}. ${t('Tipos')}: ${C.TYPES.map(x => x[0]).join(', ')}.</p>
+      <div class="row end"><button class="btn" data-a="orbCheck">${t('Comprobar')}</button><button class="btn pri" data-a="orbApply"${r && r.units.length ? '' : ' disabled'}>✔ ${t('Aplicar')}</button></div>`);
+  }
+  Object.assign(U.A, {
+    newOpWiz: () => drawWiz(),
+    wizK: d => { wiz.k = d.k; drawWiz(); },
+    wizGo: () => { const o = W.blankOp(''); TPL().apply(o, wiz.k, wiz.name.trim() || t(TPL().LIST[wiz.k].l)); W.ensure(o); U.store.ops.push(o); U.store.cur = o.id; U.store.sec = 'inputs'; o.ui.inTab = 'op'; wiz.name = ''; U.closeModal(); U.save(true); U.render(); U.toast(t('Operación creada')); },
+    orbPaste: () => { orbP.res = null; drawOrb(); },
+    orbMode: (d, el) => { orbP.mode = el.value; },
+    orbCheck: () => { orbP.res = TPL().parseOrbat(orbP.text, C); drawOrb(); },
+    orbApply: () => {
+      const o = U.op(), r = orbP.res || TPL().parseOrbat(orbP.text, C); if (!r.units.length) return;
+      const go = () => {
+        if (orbP.mode === 'rep') { o.orbat = []; o.coas.forEach(c => { c.plan = {}; }); o.ecoas.forEach(e => { e.plan = {}; }); o.games = {}; o.prep.positions = []; }
+        const have = new Set(o.orbat.map(u => u.id)), ren = {};
+        r.units.forEach(u => { if (have.has(u.id)) { const n = u.id + '-' + Math.random().toString(36).slice(2, 5); ren[u.id] = n; u.id = n; } have.add(u.id); });
+        r.units.forEach(u => { if (u.p && ren[u.p]) u.p = ren[u.p]; o.orbat.push(u); if (!u.p) o.ui.open[u.id] = 1; });
+        orbP.text = ''; orbP.res = null; U.closeModal(); U.save(true); U.render(); U.toast(t('{n} unidades incorporadas', { n: r.units.length }));
+      };
+      if (orbP.mode === 'rep') { U.closeModal(); U.ask(t('¿Sustituir el ORBAT? Se borran los planes por turno y las confrontaciones de esta operación.'), go); } else go();
+    }
   });
 })(typeof window !== 'undefined' ? window : globalThis);

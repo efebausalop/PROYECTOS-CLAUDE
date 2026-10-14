@@ -1,6 +1,23 @@
-# COA Wargaming Tool — v0.2
+# COA Wargaming Tool — v0.3
 
 Herramienta para el **Paso 4 del planeamiento OTAN (AJP-5(A) / APP-28(B) Anexo D)**: confrontación de las líneas de acción propias (**BLUE COA**) con las del adversario obtenidas en el IPOE (**RED COA / ECOA**).
+
+## Novedades de la v0.3
+
+- **Válida para cualquier operación terrestre de nivel táctico.** El asistente «Nueva operación» ofrece plantillas para ataque deliberado, defensa de zona, defensa móvil, acción retardadora, paso de curso de agua, asalto anfibio (componente terrestre), operación en zona urbana, asalto aéreo y movimiento para el contacto, además de una en blanco. Cada plantilla prepara fases, sectores, métodos, turnos, eventos críticos, criterios, CCIR y supuestos tipo. El motor incorpora cuatro tareas nuevas: paso de curso de agua, asalto aéreo, ataque en zona urbana y repliegue.
+- **IA (Claude) para alimentar todos los campos** (sección «IA · Alimentar planeamiento»):
+  - importa un documento (.txt, .md, .docx, .pdf o texto pegado) y rellena la operación completa: fases, sectores, orden superior, pasos 1–3, estimaciones, CPG y criterios, COA, ECOA, ORBAT con su tipo de F.E., turnos, eventos críticos, registros y supuestos;
+  - interpreta cada COA y cada ECOA en un plan por turnos, con enfrentamientos, unidades, tareas, sectores, HPT y modificadores (de una en una o todas en cadena);
+  - redacta COA y ECOA nuevas;
+  - asiste cada turno de la confrontación (reacción roja, contrarreacción azul, justificación del árbitro, ramas y aportación de cada función de EM);
+  - propone el borrador de FACDS, fortalezas, debilidades, conclusiones y COA refinada.
+
+  Cada propuesta se valida contra el ORBAT, los sectores, los turnos y el catálogo de tareas, y se revisa antes de aplicarse. El resultado numérico lo sigue calculando el motor empírico.
+
+  Proveedores disponibles: **Claude en claude.ai** (artefacto publicado, sin clave; pide permiso la primera vez), **API de Anthropic con clave propia** (sólo en uso local; la clave se guarda en el navegador y nunca se exporta) y **manual** (copiar el prompt en Claude y pegar la respuesta), que funciona siempre.
+- **Roles de la confrontación.** Hay 15 roles: comandante, director, árbitro, registrador, célula azul (S3), célula roja (S2), fuegos, ingenieros, S1, S4, S6, S9, información, protección y asesor jurídico. Cada uno tiene sus responsabilidades, una lista de comprobación previa y sus preguntas por turno. El «Rol activo» de la cabecera aísla las células azul y roja y muestra a cada función su panel de aportación en cada turno. Esa aportación pasa a la matriz de sincronización, que suma las filas de ingenieros, personal y asesoría jurídica.
+- **ORBAT pegado desde Excel, Word o CSV**, con reconocimiento de columnas.
+- Se ha retirado la operación GARNACHA.
 
 La v0.2 parte de **wargaming_nato v2 (EIMGAF)**: conserva su flujo de trabajo, su ORBAT hasta compañía, su catálogo de la Force Ratio Calculator Matrix, su tabla BCTP, la adjudicación con dados, los registros y el asistente. Sobre esa base añade:
 
@@ -24,10 +41,12 @@ Abra `index.html` en un navegador (Chrome, Edge o Firefox); no requiere instalac
 
 | Grupo | Sección | Contenido |
 |---|---|---|
-| Entradas | 1 Datos de planeamiento | Operación y escenario (sectores, fases, medidas de control), orden superior, pasos 1–3 y COA propias, estimaciones, CPG y criterios, COA enemigas con MLCOA/MDCOA y probabilidad |
+| Entradas | IA · Alimentar planeamiento | Proveedor de IA, importación de documentos, interpretación de COA y ECOA por turnos, redacción de COA, ECOA y conclusiones |
+| | 1 Datos de planeamiento | Operación y escenario (sectores, fases, medidas de control), orden superior, pasos 1–3 y COA propias, estimaciones, CPG y criterios, COA enemigas con MLCOA/MDCOA y probabilidad |
 | | 2 ORBAT | Árbol hasta compañía con APP-6, potencia (%) y tipo de F.E. |
 | Preparación | 3 Preparación | Disposición (%), técnica, iniciativa, métodos (eventos críticos, fajas, caja, avenida), eventos críticos, DP, registro, posiciones, supuestos y CCIR |
 | | 4 Planes COA / ECOA | Enfrentamientos de la COA y despliegue de la ECOA por turno, con vista previa del cálculo |
+| | Roles y participantes | Organización de la sesión, responsabilidades y listas de comprobación de cada rol |
 | Ejecución | Confrontación | Turno a turno (A-R-CR y tres células), tarjetas u hoja; resultado sugerido por el motor |
 | | Correlación de fuerzas | Calculadora ST 100-3; puede cargar directamente un enfrentamiento del turno |
 | | Adjudicación | Tirada del motor, tirada enfrentada, tirada d10 y dados |
@@ -39,7 +58,6 @@ Abra `index.html` en un navegador (Chrome, Edge o Firefox); no requiere instalac
 ## Escenarios incluidos
 
 - **Operation TRYZUB**: la semilla íntegra de wargaming_nato v2 (ORBAT de 240 unidades, 9 turnos, registros y confrontación de la COA 1 frente a la ECOA-1). En la v0.2 se han añadido el plan de enfrentamientos de la COA 1 y el despliegue por turno de la ECOA-1 y la ECOA-2. La COA 2 queda sin plan, «a desarrollar por el sindicato», como en la v2. El turno BOX A se solapa en el tiempo con los segmentos, así que se evalúa pero no encadena bajas.
-- **Operation GARNACHA**: el guion de 6 turnos (MERLOT contra 13th MID) con sus resultados, ramas, matriz de sincronización y conclusiones. Las potencias del guion (escala 1–500) se cargan como F.E. = CP/100. El despliegue por turnos de la ECOA 2 y el F.E. del contraataque del Cuerpo son interpretaciones, y así se indica en la app.
 - **Ejercicio MAR AZUL**: asalto anfibio ficticio con dos COA y dos ECOA, para practicar la matriz. Sus F.E. son orientativos.
 
 ## Cómo calcula
@@ -67,7 +85,10 @@ wargaming-coa/
     ├── ui-inputs.js          Datos, ORBAT, preparación, planes
     ├── ui-wargame.js         Confrontación, correlación, adjudicación, registros
     ├── ui-results.js         Resumen, estadística, datos y método, asistente
-    └── scenarios/            TRYZUB (semilla v2 + planes), GARNACHA, MAR AZUL
+    ├── templates.js          Plantillas de operaciones terrestres tácticas y lector de ORBAT
+    ├── roles.js              Roles de la confrontación y aportaciones por función
+    ├── ai.js                 Asistente de IA (claude.ai, API o manual) con validación
+    └── scenarios/            TRYZUB (semilla v2 + planes), MAR AZUL
 ```
 
 Los datos se guardan en el navegador. Exporte el JSON para conservarlos o compartirlos. La impresión del navegador (Ctrl+P) genera una versión limpia de la sección abierta.

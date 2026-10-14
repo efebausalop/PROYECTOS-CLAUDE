@@ -65,6 +65,7 @@
     op.reg = Object.assign({ nai: [], tai: [], hpt: [], hvt: [], dp: [], ccir: [] }, op.reg || {});
     op.fr = Object.assign({ name: '', turn: '', fM: 'Hasty Defense', eM: 'Deliberate Attack', f: [], e: [], defSide: '', terr: 1, prep: 1, pm: 'Delay' }, op.fr || {});
     op.adj = Object.assign({ target: '', dist: 'equal', contest: 'equal', bmod: 0, rmod: 0 }, op.adj || {});
+    op.roles = Object.assign({ people: {}, chk: {}, present: {} }, op.roles || {}); if (op.opType == null) op.opType = '';
     op.evalx = op.evalx || {}; if (op.ffir == null) op.ffir = 70; if (op.dcLine == null) op.dcLine = 60;
     op.ui = Object.assign({ open: {}, orbSide: 'ALL', wgView: 'turn', wgM: 'all', inTab: 'op', regTab: 'dp', step: 0, q: '', selU: '', planTurn: '', wgTurn: 0, wgStep: 0, cell: 'white', statPair: '' }, op.ui || {});
     if (!op.coas.find(c => c.id === op.prep.coa)) op.prep.coa = op.coas[0] ? op.coas[0].id : '';

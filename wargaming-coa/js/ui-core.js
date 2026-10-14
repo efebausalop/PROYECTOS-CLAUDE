@@ -12,13 +12,13 @@
   /* ------------------------------ estado ------------------------------ */
   let store = null;
   function freshStore() {
-    const ops = [SC.tryzub.build(), SC.garnacha.build(), SC.marazul.build()];
+    const ops = [SC.tryzub.build(), SC.marazul.build()];
     return { v: 3, ops, cur: ops[0].id, cfg: W.clone(E.DEFAULT_CONFIG), lang: 'es', assist: true, sec: 'inputs' };
   }
   function load() {
     try {
       const raw = localStorage.getItem(LS);
-      if (raw) { const o = JSON.parse(raw); if (o && o.v === 3 && Array.isArray(o.ops) && o.ops.length) { o.ops.forEach(W.ensure); o.cfg = mergeCfg(o.cfg); return o; } }
+      if (raw) { const o = JSON.parse(raw); if (o && o.v === 3 && Array.isArray(o.ops)) { o.ops = o.ops.filter(x => !/^op-garnacha/.test(x.id || '')); if (o.ops.length) { o.ops.forEach(W.ensure); o.cfg = mergeCfg(o.cfg); if (!o.ops.find(x => x.id === o.cur)) o.cur = o.ops[0].id; return o; } } }
     } catch (e) { /* almacenamiento no disponible */ }
     return freshStore();
   }
@@ -144,11 +144,13 @@
   /* ------------------------------ navegación ------------------------------ */
   const NAV = [
     { g: 'Entradas' },
+    { id: 'ai', ic: '✦', l: 'IA · Alimentar planeamiento' },
     { id: 'inputs', ic: '1', l: 'Datos de planeamiento' },
     { id: 'orbat', ic: '2', l: 'ORBAT (hasta compañía)' },
     { g: 'Preparación' },
     { id: 'prep', ic: '3', l: 'Preparación' },
     { id: 'plans', ic: '4', l: 'Planes COA / ECOA' },
+    { id: 'roles', ic: '☷', l: 'Roles y participantes' },
     { g: 'Ejecución' },
     { id: 'wargame', ic: '⚔', l: 'Confrontación' },
     { id: 'fr', ic: '⚖', l: 'Correlación de fuerzas' },
@@ -169,8 +171,9 @@
       wargame: `<span class="bd ${adj === act.length && act.length ? 'ok' : ''}">${adj}/${act.length}</span>`,
       reg: `<span class="bd">${regN}</span>`
     };
+    const rl = U.role && U.role(), rk = new Set(rl ? rl.go : []);
     $('side').innerHTML = NAV.map(n => n.g ? `<div class="grp">${t(n.g)}</div>` :
-      `<button class="nav ${store.sec === n.id ? 'on' : ''}" data-a="go" data-t="${n.id}" title="${esc(t(n.l))}"><span class="ic">${n.ic}</span><span class="l">${t(n.l)}</span>${bd[n.id] || ''}</button>`).join('') +
+      `<button class="nav ${store.sec === n.id ? 'on' : ''}${rk.has(n.id) ? ' rk' : ''}" data-a="go" data-t="${n.id}" title="${esc(t(n.l))}"><span class="ic">${n.ic}</span><span class="l">${t(n.l)}</span>${bd[n.id] || ''}</button>`).join('') +
       `<div class="foot">${t('APP-28(B) Anexo D · AJP-5(A). Se guarda en este navegador; use Exportar para conservar o compartir.')}</div>`;
   };
   U.go = function (id) { store.sec = id; U.render(); window.scrollTo(0, 0); save(); };
@@ -187,6 +190,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); el.setAttribute('aria-label', t(el.dataset.i18nTitle)); });
     const pr = $('printBtn'); if (pr) pr.hidden = !(window.self === window.top);
+    if (U.renderRoleSel) U.renderRoleSel();
   }
   U.render = function () {
     fid = 0;
@@ -211,7 +215,7 @@
     const m = $('modal'); $('mbox').innerHTML = `<div class="mb"><p>${esc(msg)}</p><div class="row end"><button class="btn" data-a="mclose">${t('Cancelar')}</button><button class="btn danger" data-a="myes">${t('Confirmar')}</button></div></div>`;
     m.hidden = false; m.classList.add('on'); const b = m.querySelector('[data-a="myes"]'); if (b) b.focus();
   }
-  function closeModal() { const m = $('modal'); m.classList.remove('on'); m.hidden = true; pendingConfirm = null; }
+  function closeModal() { const m = $('modal'); m.classList.remove('on'); m.hidden = true; $('mbox').className = 'box'; pendingConfirm = null; }
 
   /* ------------------------------ helpers de vista ------------------------------ */
   function secH(title, sub, act) { return `<div class="sech"><div><h2>${title}</h2>${sub ? `<p class="sub">${sub}</p>` : ''}</div><div class="act">${act || ''}</div></div>`; }

@@ -30,7 +30,11 @@
       hastyAtk: { label: 'Ataque precipitado',              plan: 'Attack (hasty)',                req: 2.5,     pair: 'Hasty Attack vs Hasty Defense',           brk: false },
       delibAtk: { label: 'Ataque deliberado',               plan: 'Attack (prepared / fortified)', req: 3,       pair: 'Deliberate Attack vs Deliberate Defense', brk: false },
       amphAslt: { label: 'Asalto anfibio',                  plan: 'Attack (prepared / fortified)', req: 3,       pair: 'Deliberate Attack vs Deliberate Defense', brk: false },
-      meeting:  { label: 'Combate de encuentro',            plan: 'Attack (hasty)',                req: 1,       pair: 'Meeting Engagement vs Meeting Engagement', brk: false }
+      meeting:  { label: 'Combate de encuentro',            plan: 'Attack (hasty)',                req: 1,       pair: 'Meeting Engagement vs Meeting Engagement', brk: false },
+      gapX:     { label: 'Paso de curso de agua (asalto)',  plan: 'Attack (prepared / fortified)', req: 3,       pair: 'Deliberate Attack vs Deliberate Defense', brk: false },
+      airAslt:  { label: 'Asalto aéreo / helitransportado', plan: 'Attack (hasty)',                req: 2.5,     pair: 'Hasty Attack vs Hasty Defense',           brk: false },
+      urbanAtk: { label: 'Ataque en zona urbana',           plan: 'Attack (prepared / fortified)', req: 4,       pair: 'Deliberate Attack vs Deliberate Defense', brk: false },
+      withdraw: { label: 'Repliegue / ruptura del contacto', plan: 'Delay',                        req: 1 / 6,   pair: 'Deliberate Defense vs Deliberate Attack', brk: true }
     },
     mods: {
       terrain:  { label: 'Terreno (para Azul)',          opts: [['Desfavorable', 0.8], ['Neutral', 1], ['Favorable', 1.2], ['Muy favorable', 1.4]], def: 1 },

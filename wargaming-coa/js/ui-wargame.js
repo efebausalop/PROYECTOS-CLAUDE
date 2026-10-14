@@ -48,7 +48,7 @@
     const ci = o.coas.indexOf(c), ei = o.ecoas.indexOf(e), oi = o.turns.indexOf(tt);
     c.plan[tt.id] = c.plan[tt.id] || { a: '', eng: [] }; e.plan[tt.id] = e.plan[tt.id] || { pre: '', r: '', place: [] };
     const bp = 'coas.' + ci + '.plan.' + tt.id, rp = 'ecoas.' + ei + '.plan.' + tt.id, gp = 'turns.' + tt.id;
-    const ce = o.ces.find(x => x.id === tt.ce), cell = o.ui.cell || 'white';
+    const ce = o.ces.find(x => x.id === tt.ce), forced = U.roleCell ? U.roleCell() : null, cell = forced || o.ui.cell || 'white', role = U.role ? U.role() : null;
     const mc = E.monteCarlo(o, c, e, U.cfg(), { onlyTurn: tt.id, startStr: T.startStr, game: g, n: Math.min(1000, U.cfg().sim.n), tag: 'turn' });
     const cls = id => (stepId === id ? ' active-step' : '');
     const nav = `<div class="turns">${list.map((x, i) => `<button class="turn-btn" data-a="wgTurn" data-i="${i}" aria-current="${i === idx}"><b>${esc(x.t.label)}</b><span>${esc(x.t.time)}</span>${U.resTag((g.turns[x.t.id] || {}).res || x.suggested || '')}</button>`).join('')}</div>`;
@@ -61,9 +61,9 @@
     const sug = T.suggested;
     return `<div class="card"><div class="cb">${nav}
       <div class="row between"><div><h3>${esc(tt.label)} — ${esc(tt.title)}</h3><p class="muted small">${esc(tt.time)} · ${t(U.METHODS[tt.m].l)}${ce ? ` · <b>${esc(ce.id)}</b> ${esc(ce.title)} <span class="tag info">${esc(ce.dc)}</span>` : ''}${T.counts ? '' : ' · <b>' + t('no encadena bajas') + '</b>'}</p></div>
-      <div class="row"><span class="fl nm">${t('Vista')}</span><div class="seg" role="group">${[['white', t('Célula blanca')], ['blue', t('Célula azul')], ['red', t('Célula roja')]].map(v => `<button data-a="uitab" data-k="cell" data-t="${v[0]}" aria-pressed="${cell === v[0]}">${v[1]}</button>`).join('')}</div></div></div>
+      <div class="row"><span class="fl nm">${t('Vista')}</span>${forced ? `<span class="tag ${forced === 'red' ? 'bad' : 'info'}">${esc(t(role.l))}</span><button class="btn ghost sm" data-a="go" data-t="roles">${t('cambiar rol')}</button>` : `<div class="seg" role="group">${[['white', t('Célula blanca')], ['blue', t('Célula azul')], ['red', t('Célula roja')]].map(v => `<button data-a="uitab" data-k="cell" data-t="${v[0]}" aria-pressed="${cell === v[0]}">${v[1]}</button>`).join('')}</div>`}</div></div>
       ${bar}
-      <div class="row between"><span class="muted small">${t('Paso activo')}: <b>${st[si][1]}</b></span><div class="row"><button class="btn sm" data-a="prevStep">${t('Anterior')}</button><button class="btn pri sm" data-a="nextStep" data-n="${list.length}">${si === st.length - 1 ? (idx < list.length - 1 ? t('Cerrar turno y pasar al siguiente') : t('Cerrar turno')) : t('Siguiente paso')}</button></div></div>
+      <div class="row between"><span class="muted small">${t('Paso activo')}: <b>${st[si][1]}</b></span><div class="row">${global.WGAI ? `<button class="btn sm" data-a="aiTurn" data-id="${esc(tt.id)}">✦ ${t('Proponer con IA')}</button>` : ''}<button class="btn sm" data-a="prevStep">${t('Anterior')}</button><button class="btn pri sm" data-a="nextStep" data-n="${list.length}">${si === st.length - 1 ? (idx < list.length - 1 ? t('Cerrar turno y pasar al siguiente') : t('Cerrar turno')) : t('Siguiente paso')}</button></div></div>
       </div></div>${warns}
       <div class="cells">
         <section class="cell blue${cell === 'red' ? ' hidden-cell' : ''}" aria-hidden="${cell === 'red'}">
@@ -90,7 +90,7 @@
           <div class="${cls('rea')}"><label class="fl row between"><span>${t('Reacción (contramaniobras, HVT, sorpresa)')}</span>${ce && ce.r && ce.r[e.id] ? `<button class="sg" data-a="sug" data-f="r" data-id="${esc(tt.id)}">✦ ${t('Sugerir')}</button>` : ''}</label>${fTa(rp + '.r', 6)}</div>
           <p class="muted small">${t('Pre-acción y reacción se guardan en la COA enemiga; contrarreacción y decisiones, en esta confrontación.')}</p>
         </section>
-      </div>
+      </div>${U.rolePanel ? U.rolePanel(o, g, tt) : ''}
       <div class="g2"><div>${card(t('Fuerzas propias en contacto tras el turno'), `<div class="strip">${strip('B')}</div>`, 'blue', `<span class="muted small">${t('Línea: FFIR-1 ({n} %)', { n: o.ffir })}</span>`)}</div><div>${card(t('Fuerzas adversarias en contacto tras el turno'), `<div class="strip">${strip('R')}</div>`, 'red')}</div></div>`;
   }
 
@@ -256,6 +256,7 @@
     hvt: { t: 'Objetivos de alto valor (HVT)', cols: [['id', 'ID', 'in', 80], ['tgt', 'Objetivo', 'ta'], ['val', 'Por qué importa al enemigo', 'ta'], ['xs', 'Serie de objetivos', 'in', 90], ['means', 'Medios', 'in'], ['st', 'Estado', 'l:PLANNED,ENGAGED,ACHIEVED,FAILED', 110]] }
   };
   const nid = (p, arr) => { let m = 0; arr.forEach(x => { const r = String(x.id || '').match(/(\d+)$/); if (r) m = Math.max(m, +r[1]); }); return p + (m + 1); };
+  U.REG = REG;
   const REGNEW = {
     dp: () => ({ id: nid('DP-B', U.op().reg.dp), side: 'BLUE', dec: '', trg: '', nai: '', ccir: '', dc: '', win: '', st: 'WATCH' }),
     ccir: () => ({ id: nid('PIR-', U.op().reg.ccir.filter(c => c.type === 'PIR')), type: 'PIR', q: '', feeds: '', nai: '', st: 'OPEN' }),

@@ -16,6 +16,7 @@
   <div class="ttl"><b id="opTitle">COA Wargaming</b><span><span data-i18n="Paso 4 · Análisis de líneas de acción">Paso 4 · Análisis de líneas de acción</span> · <span id="opTag"></span></span></div>
   <div class="hdr">
     <select id="opSel" aria-label="Operación activa"></select>
+    <select id="roleSel" aria-label="Rol activo"></select>
     <div class="seg" role="group" aria-label="Idioma"><button class="tbtn" data-a="lang" data-lang="es">ES</button><button class="tbtn" data-a="lang" data-lang="en">EN</button></div>
     <button class="tbtn" data-a="exportOp" data-i18n-title="Exportar la operación activa (.json)">⬇ <span data-i18n="Exportar">Exportar</span></button>
     <button class="tbtn" data-a="importOpen" data-i18n-title="Importar una operación o una copia de wargaming_nato v2 (.json)">⬆ <span data-i18n="Importar">Importar</span></button>
@@ -37,13 +38,15 @@
 <script src="js/model.js"></script>
 <script src="js/scenarios/tryzub-v2seed.js"></script>
 <script src="js/scenarios/tryzub.js"></script>
-<script src="js/scenarios/garnacha.js"></script>
 <script src="js/scenarios/marazul.js"></script>
+<script src="js/templates.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/ui-core.js"></script>
 <script src="js/ui-inputs.js"></script>
 <script src="js/ui-wargame.js"></script>
 <script src="js/ui-results.js"></script>
+<script src="js/roles.js"></script>
+<script src="js/ai.js"></script>
 <script>WGUI.boot();</script>
 </body>
 </html>
