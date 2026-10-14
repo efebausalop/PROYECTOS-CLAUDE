@@ -7,30 +7,43 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand"><h1>COA Wargaming</h1><span class="op" id="opName"></span></div>
-    <span class="classif" id="classif"></span>
-    <nav class="tabs" aria-label="Fases de la confrontación">
-      <button class="tab" data-tab="op"><span class="n">1</span>Operación</button>
-      <button class="tab" data-tab="oob"><span class="n">2</span>Fuerzas</button>
-      <button class="tab" data-tab="coa"><span class="n">3</span>Líneas de acción</button>
-      <button class="tab" data-tab="wg"><span class="n">4</span>Confrontación</button>
-      <button class="tab" data-tab="prod"><span class="n">5</span>Productos</button>
-      <button class="tab" data-tab="res"><span class="n">6</span>Resultados</button>
-      <button class="tab" data-tab="data"><span class="n">7</span>Datos y método</button>
-    </nav>
+<header id="top">
+  <div class="logo" aria-hidden="true">WG</div>
+  <div class="ttl"><b id="opTitle">COA Wargaming</b><span><span data-i18n="Paso 4 · Análisis de líneas de acción">Paso 4 · Análisis de líneas de acción</span> · <span id="opTag"></span></span></div>
+  <div class="hdr">
+    <select id="opSel" aria-label="Operación activa"></select>
+    <div class="seg" role="group" aria-label="Idioma"><button class="tbtn" data-a="lang" data-lang="es">ES</button><button class="tbtn" data-a="lang" data-lang="en">EN</button></div>
+    <button class="tbtn" data-a="exportOp" data-i18n-title="Exportar la operación activa (.json)">⬇ <span data-i18n="Exportar">Exportar</span></button>
+    <button class="tbtn" data-a="importOpen" data-i18n-title="Importar una operación o una copia de wargaming_nato v2 (.json)">⬆ <span data-i18n="Importar">Importar</span></button>
+    <input type="file" id="imp" accept=".json,application/json" hidden>
+    <button class="tbtn" id="printBtn" data-a="print" hidden>🖨 <span data-i18n="Imprimir">Imprimir</span></button>
+    <button class="tbtn" id="asBtn" data-a="assist">✦ <span data-i18n="Asistente">Asistente</span></button>
+    <span id="saveState">—</span>
   </div>
 </header>
-<main class="wrap" id="app"></main>
-<footer class="wrap foot">Paso 4 · Análisis de líneas de acción (AJP-5(A), APP-28(B) Anexo D). Uso pedagógico. Los datos se guardan sólo en este navegador; exporte en JSON para conservarlos o compartirlos.</footer>
+<div id="app">
+  <nav id="side" aria-label="Fases del proceso"></nav>
+  <main id="main"></main>
+  <aside id="assist" aria-label="Asistente"></aside>
+</div>
+<div class="modal" id="modal" hidden><div class="box" id="mbox" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="js/catalog.js"></script>
 <script src="js/engine.js"></script>
-<script src="js/examples.js"></script>
-<script src="js/app.js"></script>
+<script src="js/model.js"></script>
+<script src="js/scenarios/tryzub-v2seed.js"></script>
+<script src="js/scenarios/tryzub.js"></script>
+<script src="js/scenarios/garnacha.js"></script>
+<script src="js/scenarios/marazul.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/ui-core.js"></script>
+<script src="js/ui-inputs.js"></script>
+<script src="js/ui-wargame.js"></script>
+<script src="js/ui-results.js"></script>
+<script>WGUI.boot();</script>
 </body>
 </html>
