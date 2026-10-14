@@ -1,0 +1,341 @@
+/* ==========================================================================
+   WGMap — plano «Mesa de planeamiento con calcos» (prefijo mp-)
+   Sólo variables de diseño de css/shell.css (§2.2); los valores tras la coma
+   son reservas del tema claro por si la hoja de tokens aún no ha cargado.
+   Los trazos geométricos no escalan (vector-effect) y los rótulos viven en
+   grupos de tamaño constante en pantalla (.mp-sc), así que los px son px.
+   ========================================================================== */
+.mp-root { position: relative; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden;
+  background: var(--table, #2A322D); outline: none; user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.mp-root:focus-visible { box-shadow: inset 0 0 0 2px var(--sel, #0B8F8F); }
+.mp-svg { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab;
+  font-family: var(--f-head, "Barlow Condensed", "Arial Narrow", sans-serif); }
+.mp-panning .mp-svg, .mp-dragging .mp-svg { cursor: grabbing; }
+.mp-drawing .mp-svg { cursor: crosshair; }
+.mp-svg :is(path, line, polyline, polygon, rect, circle, ellipse) { vector-effect: non-scaling-stroke; }
+.mp-svg text { paint-order: stroke fill; stroke: var(--halo, #EEEADF); stroke-width: 3px; stroke-linejoin: round; }
+.mp-svg [data-ref] { cursor: pointer; }
+.mp-mono { font-family: var(--f-mono, "IBM Plex Mono", ui-monospace, monospace); font-variant-numeric: tabular-nums; }
+
+/* capas apagadas (layers) */
+.mp-off-base [data-layer="base"], .mp-off-cm [data-layer="cm"], .mp-off-isr [data-layer="isr"], .mp-off-red [data-layer="red"],
+.mp-off-blue [data-layer="blue"], .mp-off-sync [data-layer="sync"], .mp-off-adj [data-layer="adj"], .mp-off-method [data-layer="method"],
+.mp-off-relief .mp-relief, .mp-off-grid .mp-gridl, .mp-off-grid .mp-gridg { display: none; }
+[data-layer="edit"], [data-layer="marg"] { pointer-events: none; }
+[data-layer="edit"] .mp-h { pointer-events: auto; }
+
+/* ---------- hoja, banda de marginalia y sectores ---------- */
+.mp-band { fill: var(--margin, #D9D1BE); }
+.mp-paper { fill: var(--paper, #EEEADF); }
+.mp-tile.t0 { fill: var(--paper, #EEEADF); }
+.mp-tile.t1 { fill: var(--paper-2, #E3DDCE); }
+.mp-wm { font: 700 28px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .05em; fill: var(--cm, #1B1F1D); opacity: .12; stroke: none; }
+.mp-wmg { pointer-events: none; }
+
+/* ---------- terreno esquemático ---------- */
+.mp-terrain, .mp-gridl { pointer-events: none; }
+.mp-img .mp-terrain { display: none; }
+.mp-img.mp-imgfail .mp-terrain { display: inline; }
+.mp-imgfail .mp-bgimg { display: none; }
+.mp-wash { fill: var(--paper, #EEEADF); }
+.mp-veg { fill: var(--veg, #D2DBBF); stroke: none; }
+.mp-rel { fill: none; stroke: var(--contour, #CBBD9C); stroke-width: 1px; opacity: .6; }
+.mp-sea { fill: var(--water, #B5CFD6); stroke: none; }
+.mp-coast { fill: none; stroke: var(--water-ink, #3E7282); stroke-width: 1.4px; stroke-linejoin: round; }
+.mp-river-e { fill: none; stroke: var(--water-ink, #3E7282); stroke-width: 7.6px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-river { fill: none; stroke: var(--water, #B5CFD6); stroke-width: 5.6px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-urb { fill: var(--urban, #D7CBBD); stroke: none; }
+.mp-urbh { stroke: none; }
+.mp-hl-urb { stroke: var(--cm-2, #4E5550); stroke-width: 1.2px; opacity: .3; vector-effect: none; }
+.mp-hl-red { stroke: var(--hostile, #BF1E2E); stroke-width: 1.6px; opacity: .55; vector-effect: none; }
+.mp-road { fill: none; stroke: var(--road, #B8AD96); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-gridl { fill: none; stroke: var(--grid, #C8BEA6); stroke-width: 1px; stroke-dasharray: 1 5; opacity: .9; }
+
+/* ---------- medidas de control ---------- */
+.mp-bnd { fill: none; stroke: var(--cm-2, #4E5550); stroke-width: 1px; stroke-dasharray: 10 3 2 3; pointer-events: none; }
+.mp-f .mp-fs { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.4px; stroke-linejoin: round; stroke-linecap: round; }
+.mp-fh { fill: none; stroke: var(--sel, #0B8F8F); stroke-width: 6px; stroke-linejoin: round; stroke-linecap: round; opacity: 0; }
+.mp-sel > .mp-fh, .mp-f.mp-snap > .mp-fh { opacity: .85; }
+.mp-f.mp-snap > .mp-fh { stroke: var(--contact, #D97A00); }
+.mp-hit { fill: none; stroke: transparent; stroke-width: 14px; pointer-events: stroke; }
+.mp-coarse .mp-hit { stroke-width: 26px; }
+.mp-fhit { pointer-events: visible; }
+.mp-hitc { fill: transparent; stroke: none; pointer-events: all; }
+.mp-f { pointer-events: none; }
+.mp-f .mp-hit, .mp-f .mp-fhit, .mp-f .mp-hitc, .mp-f .mp-fs, .mp-f text, .mp-f .mp-lbox, .mp-f .mp-hilltri, .mp-f .mp-xbar { pointer-events: visiblePainted; }
+.mp-f .mp-fhit { pointer-events: visible; }
+.mp-f.k-line .mp-fs { stroke-width: 1.6px; }
+.mp-f.k-line.s-bhl .mp-fs { stroke-dasharray: 12 4; }
+.mp-f.k-line.s-beachline .mp-fs.mp-dbl { stroke-width: 5px; }
+.mp-dbl-i { fill: none; stroke: var(--paper, #EEEADF); stroke-width: 3px; stroke-linecap: butt; pointer-events: none; }
+.mp-f.k-redline .mp-fs { stroke: var(--hostile, #BF1E2E); stroke-dasharray: 8 4; }
+.mp-f.k-obstacle .mp-fs, .mp-teeth { stroke: var(--cm, #1B1F1D); }
+.mp-teeth { fill: none; stroke-width: 1.2px; stroke-linejoin: round; }
+.mp-f.k-ea .mp-fs { fill: var(--cm, #1B1F1D); fill-opacity: .04; }
+.mp-f.k-obj .mp-fs { stroke-width: 2px; fill: var(--cm, #1B1F1D); fill-opacity: .03; }
+.mp-f.k-area .mp-fs { stroke: var(--cm-2, #4E5550); stroke-width: 1px; stroke-dasharray: 1.5 3.5; }
+.mp-f.k-urban .mp-fs { stroke: var(--cm-2, #4E5550); stroke-width: .8px; }
+.mp-f.k-nai .mp-fs { stroke: var(--nai, #5E3F8F); stroke-dasharray: 6 4; fill: var(--nai-wash, rgba(94,63,143,.10)); }
+.mp-f.k-tai .mp-fs { stroke: var(--tai, #A44A1F); }
+.mp-f.k-water .mp-fs { stroke: var(--water-ink, #3E7282); }
+.mp-f.k-bp .mp-fs { stroke: var(--friend, #1F5FA8); stroke-width: 1.6px; }
+.mp-f.k-bp.side-R .mp-fs { stroke: var(--hostile, #BF1E2E); }
+.mp-f.k-lz .mp-fs { stroke: var(--cm, #1B1F1D); stroke-width: 1.2px; fill: var(--paper, #EEEADF); fill-opacity: .55; }
+.mp-beach { stroke: var(--dp-fill, #F4D35E) !important; stroke-width: 4px !important; opacity: .9; stroke-linecap: round; }
+.mp-lowconf .mp-fs { stroke-dasharray: 2 3.5 !important; }
+.mp-q { display: none; }
+.mp-lowconf .mp-q { display: inline; }
+.mp-q circle { fill: var(--contact, #D97A00); stroke: var(--halo, #EEEADF); stroke-width: 1.5px; }
+.mp-q text { font: 700 10px var(--f-mono, monospace); fill: var(--paper, #EEEADF); stroke: none; }
+
+/* rótulos de medidas */
+.mp-lbox { fill: var(--paper, #EEEADF); stroke: var(--cm, #1B1F1D); stroke-width: 1px; }
+.mp-lbox.red { stroke: var(--hostile, #BF1E2E); }
+.mp-lt { font: 600 11px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .05em; fill: var(--cm, #1B1F1D); stroke: none; }
+.mp-lt.mp-mono { font: 600 10px var(--f-mono, monospace); letter-spacing: 0; }
+.mp-lbox.red + .mp-lt, .mp-lt.mp-red { fill: var(--hostile, #BF1E2E); }
+.mp-altw { transition: none; }
+.mp-lo .mp-alt .mp-altw { transform: translate(calc(var(--ax) * 1px), calc(var(--ay) * 1px)); }
+.mp-flb { font: 600 11px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .05em; fill: var(--cm, #1B1F1D); }
+.mp-flb-ea { font-size: 12.5px; font-weight: 700; }
+.mp-flb-obj { font-size: 13.5px; font-weight: 700; letter-spacing: .07em; }
+.mp-flb-ar { fill: var(--cm-2, #4E5550); font-size: 11px; }
+.mp-flb-urb { fill: var(--cm-2, #4E5550); font-size: 10px; letter-spacing: .12em; }
+.mp-flb-bp { fill: var(--friend, #1F5FA8); font-size: 10.5px; }
+.side-R .mp-flb-bp { fill: var(--hostile, #BF1E2E); }
+.mp-flb-sm { font-size: 10px; fill: var(--cm-2, #4E5550); }
+.mp-flb-beach { font-size: 10.5px; letter-spacing: .08em; fill: var(--water-ink, #3E7282); }
+.mp-flb-off { font-size: 10px; letter-spacing: .06em; fill: var(--cm-2, #4E5550); }
+.mp-hilltri { fill: var(--cm, #1B1F1D); stroke: var(--halo, #EEEADF); stroke-width: 1px; }
+.mp-spot { font: 600 10px var(--f-mono, monospace); fill: var(--cm, #1B1F1D); }
+.mp-xbar { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.6px; stroke-linecap: round; }
+.mp-lzt { font: 700 11px var(--f-head, "Barlow Condensed", sans-serif); fill: var(--cm, #1B1F1D); }
+.mp-offa { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.6px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-note { fill: var(--cm-2, #4E5550); stroke: var(--halo, #EEEADF); stroke-width: 1px; }
+.mp-rwy { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 2.2px; stroke-linecap: round; }
+.mp-lo .mp-p2, .mp-narrow .mp-p2 { display: none; }
+
+/* ---------- marginalia ---------- */
+.mp-neat { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.4px; }
+.mp-frame { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1px; opacity: .7; }
+.mp-gridt { font: 600 10px var(--f-mono, monospace); fill: var(--cm-2, #4E5550); stroke: none; }
+.mp-lo .mp-gridg { display: none; }
+.mp-banr { fill: var(--margin, #D9D1BE); stroke: none; }
+.mp-ban { font: 700 10px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .08em; fill: var(--cm, #1B1F1D); stroke: none; }
+.mp-na { fill: var(--cm, #1B1F1D); stroke: var(--cm, #1B1F1D); stroke-width: 1px; }
+.mp-nb { fill: var(--paper, #EEEADF); stroke: var(--cm, #1B1F1D); stroke-width: 1px; }
+.mp-nt { font: 700 11px var(--f-head, "Barlow Condensed", sans-serif); fill: var(--cm, #1B1F1D); }
+.mp-scale { font: 600 10px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .08em; fill: var(--cm, #1B1F1D); }
+.mp-tb { fill: var(--sheet, #FAF8F2); fill-opacity: .96; stroke: var(--cm, #1B1F1D); stroke-width: 1px; }
+.mp-tbbar { fill: var(--dp, #B88A00); stroke: none; }
+.mp-tb1 { font: 600 11.5px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .04em; fill: var(--ink, #1B211E); stroke: none; }
+.mp-tb2 { font-size: 10.5px; font-weight: 600; fill: var(--ink-2, #4A5550); stroke: none; }
+.mp-narrow .mp-tblock { display: none; }
+
+/* ---------- línea de contacto ---------- */
+.mp-flot { pointer-events: none; }
+.mp-flh { fill: none; stroke: var(--halo, #EEEADF); stroke-width: 6.5px; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+.mp-fl { fill: none; stroke: var(--contact, #D97A00); stroke-width: 3px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-flbox { stroke: var(--contact, #D97A00); }
+.mp-fllt { fill: var(--contact, #D97A00); font-size: 10.5px; }
+
+/* ---------- NAI / TAI ---------- */
+.mp-isrf { fill: var(--nai-wash, rgba(94,63,143,.10)); stroke: var(--nai, #5E3F8F); stroke-width: 1.4px; stroke-dasharray: 6 4; stroke-linejoin: round; pointer-events: none; }
+.mp-isr.k-tai .mp-isrf { fill: none; stroke: var(--tai, #A44A1F); stroke-dasharray: none; }
+.mp-isrb { stroke: var(--nai, #5E3F8F); }
+.mp-isrb + .mp-lt { fill: var(--nai, #5E3F8F); }
+.mp-isr.k-tai .mp-isrb { stroke: var(--tai, #A44A1F); }
+.mp-isr.k-tai .mp-isrb + .mp-lt { fill: var(--tai, #A44A1F); }
+.mp-tx { fill: none; stroke: var(--tai, #A44A1F); stroke-width: 1.3px; }
+.mp-isr.mp-active .mp-isrf { stroke-dasharray: none; animation: mp-pulse 2s ease-in-out infinite; }
+.mp-isr.mp-trig .mp-isrf { stroke: var(--dp, #B88A00); stroke-dasharray: none; stroke-width: 2px; }
+.mp-isr.mp-dim { opacity: .14; }
+.mp-isr.mp-sel { opacity: 1; }
+.mp-isr.mp-sel .mp-isrf { stroke: var(--sel, #0B8F8F); stroke-width: 2.4px; }
+@keyframes mp-pulse { 0%, 100% { fill-opacity: 1; } 50% { fill-opacity: .25; } }
+
+/* ---------- gráficos tácticos ---------- */
+.mp-g { --g: var(--friend, #1F5FA8); }
+.mp-g.side-R { --g: var(--hostile, #BF1E2E); }
+.mp-gout { fill: var(--g); fill-opacity: .15; stroke: var(--g); stroke-width: 1.6px; stroke-linejoin: round; }
+.mp-g.side-R .mp-gout { fill-opacity: .06; }
+.mp-gln { fill: none; stroke: var(--g); stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-gln.mp-thin { stroke-width: 1.2px; stroke-dasharray: 3 3; }
+.mp-gbar { stroke-width: 3px; }
+.mp-dash { stroke-dasharray: 7 4; }
+.mp-g.mp-nochain .mp-gout, .mp-g.mp-dashed .mp-gout, .mp-g.mp-nochain .mp-gln, .mp-g.mp-dashed .mp-gln { stroke-dasharray: 5 4; fill-opacity: .06; }
+.mp-gme { fill: none; stroke: var(--dp, #B88A00); stroke-width: 6px; stroke-linejoin: round; opacity: .55; }
+.mp-gmel { stroke-width: 8px; }
+.mp-gwave { fill: none; stroke: var(--water-ink, #3E7282); stroke-width: 1.4px; stroke-linecap: round; }
+.mp-rotor { fill: var(--paper, #EEEADF); stroke: var(--g); stroke-width: 1.6px; }
+.mp-gpen { fill: var(--g); fill-opacity: .35; stroke: var(--g); stroke-width: 1.4px; }
+.mp-glt { font: 700 12px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .06em; fill: var(--g); }
+.mp-glbl { font: 600 10px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .05em; fill: var(--g); }
+.mp-seqc { fill: var(--g); stroke: var(--halo, #EEEADF); stroke-width: 1.5px; }
+.mp-seqt { font: 700 11px var(--f-mono, monospace); fill: var(--paper, #EEEADF); stroke: none; }
+.mp-gtime { font: 600 10px var(--f-mono, monospace); fill: var(--g); }
+.mp-g.mp-sel .mp-gout, .mp-g.mp-sel .mp-gln { stroke: var(--sel, #0B8F8F); stroke-width: 2.6px; }
+.mp-g * { pointer-events: none; }
+.mp-g .mp-gout, .mp-g .mp-gln, .mp-g .mp-gpen, .mp-g text, .mp-g .mp-seqc { pointer-events: visiblePainted; }
+.mp-pop.mp-new.mp-don .mp-gout[pathLength], .mp-pop.mp-new.mp-don .mp-gln[pathLength] { stroke-dasharray: 1; animation: mp-draw .4s ease-out; }
+@keyframes mp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- unidades ---------- */
+.mp-u .mp-usel { fill: none; stroke: var(--sel, #0B8F8F); stroke-width: 3px; stroke-linejoin: round; opacity: 0; }
+.mp-u.sel .mp-usel, .mp-u.mp-sel .mp-usel { opacity: 1; }
+.mp-ume { fill: none; stroke: var(--dp, #B88A00); stroke-width: 7px; stroke-linejoin: round; opacity: .8; }
+.mp-uhalo { fill: none; stroke: var(--halo, #EEEADF); stroke-width: 3px; stroke-linejoin: round; }
+.mp-usym { color: var(--mdcoa, #A3156B); }
+.mp-rtrack { fill: none; stroke: var(--cm-2, #4E5550); stroke-width: 2.4px; opacity: .22; }
+.mp-rtrack.mp-none { display: none; }
+.mp-ring { fill: none; stroke-width: 2.4px; stroke-linecap: round; stroke: var(--ok, #1d7a3e); }
+.mp-ring.b-warn { stroke: var(--warn, #9a6200); }
+.mp-ring.b-bad { stroke: var(--bad, #b3262f); }
+.mp-ulbl { font: 600 11px var(--f-head, "Barlow Condensed", sans-serif); letter-spacing: .04em; fill: var(--ink, #1B211E); }
+.mp-u.side-B .mp-ulbl { fill: var(--friend, #1F5FA8); }
+.mp-u.side-R .mp-ulbl { fill: var(--hostile, #BF1E2E); }
+.mp-u.me .mp-ulbl { font-weight: 700; }
+.mp-ulast { fill: none; stroke: var(--hostile, #BF1E2E); stroke-width: 1.6px; stroke-dasharray: 3 2; }
+.mp-u.side-B .mp-ulast { stroke: var(--friend, #1F5FA8); }
+.mp-uq { font: 700 10px var(--f-mono, monospace); fill: var(--hostile, #BF1E2E); stroke: none; }
+.mp-ubadge { display: none; }
+.mp-ubadge.on { display: inline; }
+.mp-ubadge circle { fill: var(--cm, #1B1F1D); stroke: var(--halo, #EEEADF); stroke-width: 1.2px; }
+.mp-ubadge text { font: 600 9px var(--f-mono, monospace); fill: var(--paper, #EEEADF); stroke: none; }
+.mp-u.mp-col { display: none; }
+.mp-u.ghost .mp-uhalo, .mp-u.ghost .mp-rtrack, .mp-u.ghost .mp-ring { display: none; }
+.mp-u.ghost .mp-ulbl { fill: var(--mdcoa, #A3156B); font-style: italic; }
+.mp-u.ffir .mp-uhalo { stroke: var(--bad, #b3262f); stroke-width: 2px; }
+.mp-lo .mp-u:not(.me):not(.sel):not(.mp-sel) .mp-ulbl { display: none; }
+.mp-u * { pointer-events: none; }
+.mp-u .mp-usym, .mp-u .mp-ulast, .mp-u .mp-uhalo, .mp-u .mp-ulbl { pointer-events: visiblePainted; }
+.mp-editing .mp-u { cursor: move; }
+
+/* ---------- glifos de función ---------- */
+.mp-glyph .mp-glp { fill: var(--sheet, #FAF8F2); fill-opacity: .94; stroke: var(--friend, #1F5FA8); stroke-width: 1.2px; }
+.mp-glyph .mp-gly { fill: none; stroke: var(--friend, #1F5FA8); stroke-width: 1.5px; stroke-linecap: round; stroke-linejoin: round; vector-effect: none; }
+.mp-glyph .mp-gly * { vector-effect: none; }
+.mp-glyph.mp-auto .mp-glp { stroke-dasharray: 2 2.2; fill-opacity: .82; }
+.mp-glyph.mp-auto .mp-gly { opacity: .78; }
+.mp-glyph.mp-fnoff { display: none; }
+.mp-glyph.mp-sel .mp-glp { stroke: var(--sel, #0B8F8F); stroke-width: 2.4px; stroke-dasharray: none; }
+.mp-lead { stroke: var(--cm-2, #4E5550); stroke-width: 1px; opacity: 0; pointer-events: none; }
+.mp-lead.on { opacity: .7; }
+
+/* ---------- DP / HPT ---------- */
+.mp-dp { --d: var(--dp, #B88A00); }
+.mp-dp.side-R { --d: var(--hostile, #BF1E2E); }
+.mp-dpd { fill: var(--paper, #EEEADF); stroke: var(--d); stroke-width: 1.6px; stroke-linejoin: round; }
+.mp-dptrack { fill: none; stroke: var(--d); stroke-width: 2.2px; opacity: 0; }
+.mp-dpring { fill: none; stroke: var(--d); stroke-width: 2.4px; stroke-linecap: round; }
+.mp-dp.st-open .mp-dptrack { opacity: .22; }
+.mp-dp.st-open .mp-dpd, .mp-dp.st-triggered .mp-dpd { fill: var(--dp-fill, #F4D35E); }
+.mp-dp.side-R.st-open .mp-dpd, .mp-dp.side-R.st-triggered .mp-dpd { fill: var(--hostile-fill, #FF8080); }
+.mp-dp.st-open .mp-dpw { animation: mp-breathe 1.6s ease-in-out infinite; }
+.mp-dp.st-after, .mp-dp.st-missed { opacity: .5; }
+.mp-dp.st-after .mp-dpd { stroke: var(--ink-3, #78827C); }
+.mp-dp.st-missed .mp-dpd { stroke: var(--hostile, #BF1E2E); stroke-dasharray: 2 2; }
+.mp-dpck { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.8px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-dpl { font: 600 10px var(--f-mono, monospace); fill: var(--d); }
+.mp-dpt { font: 400 9.5px var(--f-mono, monospace); fill: var(--ink-2, #4A5550); }
+.mp-dp.st-before .mp-dpl { opacity: .85; }
+.mp-dp.mp-sel .mp-dpd { stroke: var(--sel, #0B8F8F); stroke-width: 2.6px; }
+.mp-lo .mp-dp:not(.st-open):not(.mp-sel) .mp-dpl, .mp-lo .mp-dp:not(.st-open):not(.mp-sel) .mp-dpt { display: none; }
+@keyframes mp-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
+.mp-hpt { fill: none; stroke: var(--tai, #A44A1F); stroke-width: 1.5px; }
+.mp-hptl { font: 600 9.5px var(--f-mono, monospace); fill: var(--tai, #A44A1F); }
+
+/* ---------- contactos, enlaces, sin oposición, fichas de borde ---------- */
+.mp-ct { --o: var(--ink-3, #78827C); }
+.mp-ct.m-ok { --o: var(--ok, #1d7a3e); }
+.mp-ct.m-warn { --o: var(--warn, #9a6200); }
+.mp-ct.m-bad { --o: var(--bad, #b3262f); }
+.mp-ctr { fill: var(--paper, #EEEADF); stroke: var(--dp, #B88A00); stroke-width: 2.2px; }
+.mp-ct.me .mp-ctr { stroke-width: 3px; }
+.mp-sw { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.8px; stroke-linecap: round; }
+.mp-ctb { fill: var(--sheet, #FAF8F2); stroke: var(--o); stroke-width: 1.4px; }
+.mp-ct.out .mp-ctb { fill: var(--o); }
+.mp-ctt { font: 600 10px var(--f-mono, monospace); fill: var(--o); stroke: none; }
+.mp-ct.out .mp-ctt { fill: var(--sheet, #FAF8F2); }
+.mp-ct.mp-sel .mp-ctr { stroke: var(--sel, #0B8F8F); }
+.mp-pop { transform-box: fill-box; transform-origin: center; }
+.mp-ct .mp-pop.mp-new { animation: mp-popin .18s ease-out; }
+@keyframes mp-popin { from { transform: scale(.6); } to { transform: scale(1); } }
+.mp-link { fill: none; stroke: var(--dp, #B88A00); stroke-width: 1.6px; stroke-dasharray: 5 3; pointer-events: none; }
+.mp-unop { stroke: none; }
+.mp-unope { fill: none; stroke: var(--hostile, #BF1E2E); stroke-width: 1.2px; stroke-dasharray: 4 3; }
+.mp-unopc { fill: var(--hostile, #BF1E2E); stroke: var(--halo, #EEEADF); stroke-width: 1.5px; }
+.mp-unopx { font: 700 12px var(--f-head, sans-serif); fill: var(--paper, #EEEADF); stroke: none; }
+.mp-flk { fill: var(--contact, #D97A00); stroke: var(--halo, #EEEADF); stroke-width: 1.4px; stroke-linejoin: round; }
+.mp-flkx { font: 700 11px var(--f-head, sans-serif); fill: var(--paper, #EEEADF); stroke: none; }
+.mp-entc { fill: var(--sheet, #FAF8F2); stroke: var(--hostile, #BF1E2E); stroke-width: 1.4px; }
+.mp-etok.side-B .mp-entc { stroke: var(--friend, #1F5FA8); }
+.mp-enta { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1.4px; stroke-linecap: round; }
+.mp-edgeb { stroke: var(--contact, #D97A00); }
+.mp-edget { fill: var(--ink, #1B211E); }
+
+/* ---------- máscara, acotación y asas ---------- */
+.mp-maskg { --m: var(--m-belt, #0F6E6E); pointer-events: none; }
+.mp-maskg.m-critical, .mp-bound.m-critical { --m: var(--m-critical, #4A5560); }
+.mp-maskg.m-belt, .mp-bound.m-belt { --m: var(--m-belt, #0F6E6E); }
+.mp-maskg.m-box, .mp-bound.m-box { --m: var(--m-box, #9C4A1A); }
+.mp-maskg.m-avenue, .mp-bound.m-avenue { --m: var(--m-avenue, #34418F); }
+.mp-mask { fill: var(--mask, rgba(22,26,24,.55)); stroke: none; }
+.mp-maske { fill: none; stroke: var(--m); stroke-width: 2px; }
+.mp-fadein { animation: mp-fade .25s ease-out; }
+@keyframes mp-fade { from { fill-opacity: 0; } to { fill-opacity: 1; } }
+.mp-bound { --m: var(--m-belt, #0F6E6E); }
+.mp-bd { fill: none; stroke: var(--m); stroke-width: 2px; stroke-linejoin: round; pointer-events: stroke; }
+.mp-bdt { fill: var(--m); stroke: none; }
+.mp-bdtt { font: 600 11px var(--f-head, sans-serif); letter-spacing: .05em; fill: var(--paper, #EEEADF); stroke: none; }
+.mp-h { cursor: grab; }
+.mp-hv { fill: var(--sheet, #FAF8F2); stroke: var(--m, var(--sel, #0B8F8F)); stroke-width: 1.6px; }
+.mp-eh .mp-hv { stroke: var(--sel, #0B8F8F); }
+.mp-hm { fill-opacity: .8; }
+.mp-ha { fill: none; stroke: var(--m, var(--sel, #0B8F8F)); stroke-width: 1.3px; stroke-linecap: round; stroke-linejoin: round; }
+.mp-eh .mp-ha { stroke: var(--sel, #0B8F8F); }
+.mp-hhit { fill: transparent; stroke: none; pointer-events: all; }
+.mp-h:hover .mp-hv { fill: var(--sel, #0B8F8F); }
+
+/* ---------- llamadas (HTML sobre el plano) ---------- */
+.mp-ovl { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.mp-co { position: absolute; left: 0; top: 0; max-width: min(280px, calc(100% - 12px)); pointer-events: auto;
+  background: color-mix(in srgb, var(--sheet, #FAF8F2) 96%, transparent); color: var(--ink, #1B211E);
+  border: 1px solid var(--cm, #1B1F1D); border-radius: 2px; padding: 8px 10px; font: 400 12.5px/1.4 var(--f-body, "IBM Plex Sans", system-ui, sans-serif); }
+.mp-coline { fill: none; stroke: var(--cm, #1B1F1D); stroke-width: 1px; pointer-events: none; }
+
+/* ---------- dibujo ---------- */
+.mp-dr { fill: var(--sel, #0B8F8F); fill-opacity: .08; stroke: var(--sel, #0B8F8F); stroke-width: 1.6px; stroke-dasharray: 5 3; }
+.mp-dr.nai { fill: var(--nai-wash, rgba(94,63,143,.10)); stroke: var(--nai, #5E3F8F); }
+.mp-drv { fill: var(--sheet, #FAF8F2); stroke: var(--sel, #0B8F8F); stroke-width: 1.6px; }
+.mp-drawbar { position: absolute; left: 8px; top: 8px; right: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; pointer-events: none; }
+.mp-drh { pointer-events: auto; background: var(--sheet, #FAF8F2); color: var(--ink-2, #4A5550); border: 1px solid var(--sheet-line, #DAD3C3);
+  border-radius: 4px; padding: 5px 8px; font: 400 12px var(--f-body, system-ui, sans-serif); max-width: 100%; }
+.mp-drb { pointer-events: auto; min-height: 32px; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--cm, #1B1F1D);
+  background: var(--sheet, #FAF8F2); color: var(--ink, #1B211E); font: 600 12px var(--f-head, sans-serif); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
+.mp-drb.ok { background: var(--dp, #B88A00); border-color: var(--dp, #B88A00); color: var(--chrome, #1E2622); }
+.mp-drb:disabled { opacity: .45; cursor: default; }
+.mp-drb:focus-visible { outline: 2px solid var(--sel, #0B8F8F); outline-offset: 1px; }
+.mp-coarse .mp-drb { min-height: 44px; min-width: 44px; }
+
+/* ---------- clases de la acotación (§4.21) ---------- */
+.mp-inf { opacity: .6; }
+.mp-edge { opacity: .5; }
+.mp-ctx { opacity: .2; }
+.mp-out { display: none; }
+.mp-showall .mp-out { display: inline; opacity: .08; }
+.mp-ghost .mp-gout, .mp-ghost .mp-gln { stroke: var(--mdcoa, #A3156B); fill: none; }
+
+/* ---------- tema oscuro: los símbolos APP-6 conservan su relleno estándar ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mp-uhalo { stroke-width: 2px; }
+  :root:not([data-theme="light"]) .mp-hl-urb { opacity: .45; }
+}
+:root[data-theme="dark"] .mp-uhalo { stroke-width: 2px; }
+:root[data-theme="dark"] .mp-hl-urb { opacity: .45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mp-isr.mp-active .mp-isrf, .mp-dp.st-open .mp-dpw, .mp-ct .mp-pop.mp-new, .mp-fadein,
+  .mp-pop.mp-new.mp-don .mp-gout[pathLength], .mp-pop.mp-new.mp-don .mp-gln[pathLength] { animation: none !important; }
+}
