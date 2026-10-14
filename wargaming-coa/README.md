@@ -1,4 +1,11 @@
-# COA Wargaming Tool — v0.3
+# TACTICAL PLANNING WG SIMULATOR — v0.3
+
+<img src="img/sello-256.webp" alt="Sello del Departamento de Guerra Anfibia" width="128">
+
+Departamento de Guerra Anfibia · EIMGAF. Manual de instrucciones: [docs/Manual_TACTICAL_PLANNING_WG_SIMULATOR.pdf](docs/Manual_TACTICAL_PLANNING_WG_SIMULATOR.pdf) (fuente editable: `docs/manual.html`).
+
+> **En desarrollo (v0.4):** plano con la COA superpuesta, regla de tiempos y acotación por método. Especificación y módulos iniciales en `v04-en-desarrollo/` (no se cargan en la app).
+
 
 Herramienta para el **Paso 4 del planeamiento OTAN (AJP-5(A) / APP-28(B) Anexo D)**: confrontación de las líneas de acción propias (**BLUE COA**) con las del adversario obtenidas en el IPOE (**RED COA / ECOA**).
 

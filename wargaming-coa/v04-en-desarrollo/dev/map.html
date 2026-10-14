@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Map Harness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<!-- Banco de pruebas del renderizador del plano (WGMap). Sólo desarrollo: nunca lo carga index.html.
+     Copia local de los tokens §2.2 para trabajar sin css/shell.css; si shell.css existe, se carga después y manda. -->
+<style>
+:root {
+  --table:#2A322D; --paper:#EEEADF; --paper-2:#E3DDCE; --margin:#D9D1BE; --grid:#C8BEA6;
+  --contour:#CBBD9C; --veg:#D2DBBF; --water:#B5CFD6; --water-ink:#3E7282; --urban:#D7CBBD; --road:#B8AD96;
+  --cm:#1B1F1D; --cm-2:#4E5550;
+  --chrome:#1E2622; --chrome-2:#28332D; --chrome-line:#3A4740; --chrome-ink:#E3E8E0; --chrome-mute:#9AA79E;
+  --sheet:#FAF8F2; --sheet-2:#F1EEE5; --sheet-line:#DAD3C3; --ink:#1B211E; --ink-2:#4A5550; --ink-3:#78827C;
+  --friend:#1F5FA8; --friend-fill:#80E0FF; --friend-wash:rgba(31,95,168,.08);
+  --hostile:#BF1E2E; --hostile-fill:#FF8080; --hostile-wash:rgba(191,30,46,.08); --mdcoa:#A3156B;
+  --contact:#D97A00; --sel:#0B8F8F;
+  --nai:#5E3F8F; --nai-wash:rgba(94,63,143,.10); --tai:#A44A1F; --dp:#B88A00; --dp-fill:#F4D35E;
+  --m-critical:#4A5560; --m-belt:#0F6E6E; --m-box:#9C4A1A; --m-avenue:#34418F;
+  --mask:rgba(22,26,24,.55); --tape:#E7DCAD; --halo:#EEEADF;
+  --ok:#1d7a3e; --warn:#9a6200; --bad:#b3262f; --bg:#EFEDE6;
+  --f-head:"Barlow Condensed","Arial Narrow",sans-serif; --f-body:"IBM Plex Sans",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --table:#070A08; --paper:#141917; --paper-2:#19201C; --margin:#0F1311; --grid:#26302A;
+  --contour:#2C352F; --veg:#19251F; --water:#10242A; --water-ink:#5FA3B5; --urban:#22262A; --road:#343B36;
+  --cm:#D9DED6; --cm-2:#9EA8A1;
+  --chrome:#0B0F0D; --chrome-2:#131916; --chrome-line:#222B26; --chrome-ink:#D7DED6; --chrome-mute:#7E8B83;
+  --sheet:#161C19; --sheet-2:#1C2420; --sheet-line:#29332D; --ink:#E1E6DE; --ink-2:#AEB8B0; --ink-3:#7F8A83;
+  --friend:#6CB1FF; --friend-wash:rgba(108,177,255,.10); --hostile:#FF6B6B; --hostile-wash:rgba(255,107,107,.10); --mdcoa:#F07AC0;
+  --contact:#FFB13D; --sel:#3FD0D0;
+  --nai:#B9A2E8; --nai-wash:rgba(185,162,232,.12); --tai:#E58A5C; --dp:#F2C94C; --dp-fill:#5C4A12;
+  --m-critical:#A9B4C0; --m-belt:#45C2C2; --m-box:#E08A55; --m-avenue:#8E9BFF;
+  --mask:rgba(0,0,0,.62); --tape:#5A5236; --halo:#141917; --bg:#0F1311;
+  --ok:#62c483; --warn:#e5b14e; --bad:#f0818a;
+  color-scheme:dark;
+} }
+:root[data-theme="dark"] {
+  --table:#070A08; --paper:#141917; --paper-2:#19201C; --margin:#0F1311; --grid:#26302A;
+  --contour:#2C352F; --veg:#19251F; --water:#10242A; --water-ink:#5FA3B5; --urban:#22262A; --road:#343B36;
+  --cm:#D9DED6; --cm-2:#9EA8A1;
+  --chrome:#0B0F0D; --chrome-2:#131916; --chrome-line:#222B26; --chrome-ink:#D7DED6; --chrome-mute:#7E8B83;
+  --sheet:#161C19; --sheet-2:#1C2420; --sheet-line:#29332D; --ink:#E1E6DE; --ink-2:#AEB8B0; --ink-3:#7F8A83;
+  --friend:#6CB1FF; --friend-wash:rgba(108,177,255,.10); --hostile:#FF6B6B; --hostile-wash:rgba(255,107,107,.10); --mdcoa:#F07AC0;
+  --contact:#FFB13D; --sel:#3FD0D0;
+  --nai:#B9A2E8; --nai-wash:rgba(185,162,232,.12); --tai:#E58A5C; --dp:#F2C94C; --dp-fill:#5C4A12;
+  --m-critical:#A9B4C0; --m-belt:#45C2C2; --m-box:#E08A55; --m-avenue:#8E9BFF;
+  --mask:rgba(0,0,0,.62); --tape:#5A5236; --halo:#141917; --bg:#0F1311;
+  --ok:#62c483; --warn:#e5b14e; --bad:#f0818a;
+  color-scheme:dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--table); color: var(--chrome-ink); font: 13px/1.4 var(--f-body); display: flex; flex-direction: column; overflow: hidden; }
+.hx-bar { background: var(--chrome); border-bottom: 1px solid var(--chrome-line); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 8px 16px; }
+.hx-bar b { font: 700 15px var(--f-head); letter-spacing: .06em; text-transform: uppercase; margin-right: 6px; }
+.hx-bar label { display: inline-flex; gap: 4px; align-items: center; color: var(--chrome-mute); white-space: nowrap; }
+.hx-bar select, .hx-bar button { font: inherit; color: var(--chrome-ink); background: var(--chrome-2); border: 1px solid var(--chrome-line); border-radius: 4px; padding: 4px 8px; min-height: 30px; cursor: pointer; }
+.hx-bar button[aria-pressed="true"] { background: var(--dp); color: var(--chrome); border-color: var(--dp); }
+.hx-bar :focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+.hx-seg { display: inline-flex; }
+.hx-seg button { border-radius: 0; }
+.hx-seg button:first-child { border-radius: 4px 0 0 4px; } .hx-seg button:last-child { border-radius: 0 4px 4px 0; }
+.hx-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 0; }
+.hx-stage { min-width: 0; min-height: 0; padding: 12px; display: flex; justify-content: center; align-items: stretch; }
+#map { width: 100%; height: 100%; border: 1px solid var(--chrome-line); }
+body.phone .hx-stage { align-items: flex-start; }
+body.phone #map { width: 390px; max-width: 100%; height: 388px; flex: none; }
+.hx-log { background: var(--chrome-2); border-left: 1px solid var(--chrome-line); overflow: auto; padding: 8px 10px; font: 11px/1.45 var(--f-mono); color: var(--chrome-mute); }
+.hx-log div { border-bottom: 1px dashed var(--chrome-line); padding: 2px 0; overflow-wrap: anywhere; }
+.hx-log b { color: var(--chrome-ink); font-weight: 600; }
+@media (max-width: 760px) { .hx-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 120px; } .hx-log { border-left: 0; border-top: 1px solid var(--chrome-line); } .hx-bar { padding: 6px 16px; } }
+</style>
+<link rel="stylesheet" href="../css/shell.css">
+<link rel="stylesheet" href="../css/map.css">
+</head>
+<body>
+<header class="hx-bar">
+  <b>WGMap</b>
+  <label>Fixture <select id="fx"><option value="mapstateTryzubH08">TRYZUB · H+08</option><option value="mapstateMarazulH02">MAR AZUL · H+02</option></select></label>
+  <span class="hx-seg" role="group" aria-label="Tema"><button data-theme="auto" aria-pressed="true">Auto</button><button data-theme="light">Día</button><button data-theme="dark">Noche</button></span>
+  <span class="hx-seg" role="group" aria-label="Idioma"><button data-lang="es" aria-pressed="true">ES</button><button data-lang="en">EN</button></span>
+  <label><input type="checkbox" id="phone"> 390 px</label>
+  <label><input type="checkbox" id="edit"> Editar</label>
+  <label>Herramienta <select id="tool"><option>select</option><option>line</option><option>area</option><option>point</option><option>nai</option></select></label>
+  <label><input type="checkbox" id="gallery"> Galería de gráficos</label>
+  <label><input type="checkbox" id="plan"> Plan (secuencia)</label>
+  <span id="layers"></span>
+  <button id="fit">Ajustar</button><button id="zin">＋</button><button id="zout">−</button><button id="svg">SVG</button>
+  <span id="view" class="hx-view"></span>
+</header>
+<main class="hx-main">
+  <div class="hx-stage"><div id="map"></div></div>
+  <aside class="hx-log" id="log" aria-label="Ganchos"></aside>
+</main>
+<script src="../js/i18n.js"></script>
+<script src="../js/catalog.js"></script>
+<script src="../tests/fixtures/mapstate.tryzub.h08.fx.js"></script>
+<script src="../tests/fixtures/mapstate.marazul.h02.fx.js"></script>
+<script src="../js/map.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const clone = o => JSON.parse(JSON.stringify(o));
+  let S = null, rev = 0;
+  const log = (name, ...a) => { const d = document.createElement('div'); d.innerHTML = '<b>' + name + '</b> ' + a.map(x => (typeof x === 'object' ? JSON.stringify(x) : String(x))).join(' · ').slice(0, 300).replace(/</g, '&lt;'); const L = $('log'); L.prepend(d); while (L.children.length > 80) L.lastChild.remove(); };
+  const bump = () => { rev++; S.hash = { base: S.hash.base, cm: 'h' + rev }; };
+  const ref = x => x.ref || x.id;
+  /* galería: los 13 tipos de gráfico táctico en la franja inferior */
+  function gallery() {
+    const K = ['axis', 'catk', 'delay', 'screen', 'block', 'bp', 'withdraw', 'gap', 'airAslt', 'amph', 'fix', 'meeting', 'penetration'];
+    return K.map((k, i) => ({ id: 'gal:' + k, ref: 'gal:' + k, kind: k, side: i % 4 === 3 ? 'R' : 'B', pts: [[0.04 + i * 0.072, 0.975], [0.08 + i * 0.072, 0.955], [0.095 + i * 0.072, 0.91]], label: k, ech: i % 3 ? 'battalion' : 'brigade', me: k === 'axis', cls: '' }));
+  }
+  function planGraphics() {
+    return [
+      { id: 'pl:1', ref: 'turn:t3', kind: 'axis', side: 'B', pts: [[0.80, 0.70], [0.76, 0.71], [0.73, 0.71]], seq: 1, time: 'H → H+12', ech: 'battalion', me: true },
+      { id: 'pl:2', ref: 'turn:t4', kind: 'catk', side: 'B', pts: [[0.71, 0.80], [0.75, 0.74]], seq: 2, time: 'H+12 → H+24', ech: 'battalion' },
+      { id: 'pl:3', ref: 'turn:t6', kind: 'withdraw', side: 'B', pts: [[0.70, 0.62], [0.55, 0.63], [0.40, 0.62]], seq: 3, time: 'H+24 → H+48' },
+      { id: 'pl:5', ref: 'turn:t5', kind: 'block', side: 'B', pts: [[0.33, 0.70], [0.30, 0.70]], seq: '', time: 'H+48 → H+96', cls: 'nochain' }
+    ];
+  }
+  function state() {
+    const s = S;
+    s.edit = $('edit').checked; s.tool = $('tool').value;
+    const base = s._g || (s._g = s.graphics.slice());
+    s.graphics = base.concat($('gallery').checked ? gallery() : [], $('plan').checked ? planGraphics() : []);
+    return s;
+  }
+  const hooks = {
+    select(r, ev) { S.sel = r || ''; S.units.forEach(u => { u.sel = u.ref === r; }); log('select', r, ev); map.update(state()); },
+    hover(r) { if (r) log('hover', r); },
+    dragUnit(id, uv, phase, snap) {
+      const u = S.units.find(x => x.id === id); if (!u) return;
+      if (phase !== 'start') { u.u = uv.u; u.v = uv.v; map.update(state()); }
+      if (phase !== 'move') log('dragUnit', id, uv, phase, snap);
+    },
+    dragFeature(r, geo, phase) {
+      if (phase !== 'move') log('dragFeature', r, geo.pts ? geo.pts.length + ' pts' : geo, phase);
+      if (phase !== 'end') return;
+      const f = S.features.find(x => ref(x) === r) || S.isr.find(x => ref(x) === r); if (!f) return;
+      if (geo.pts) f.pts = geo.pts;
+      else { const c = f.pts.reduce((a, p) => [a[0] + p[0] / f.pts.length, a[1] + p[1] / f.pts.length], [0, 0]); f.pts = f.pts.map(p => [p[0] + geo.u - c[0], p[1] + geo.v - c[1]]); }
+      bump(); map.update(state());
+    },
+    dragLine(r, p, phase) {
+      if (phase !== 'move') log('dragLine', r, p, phase);
+      if (phase !== 'end') return;
+      const f = S.features.find(x => ref(x) === r); if (!f) return;
+      const from = (S.axis && S.axis.from) || 'E', d = from === 'E' ? (1 - p) - (1 - f.p) : p - f.p;
+      f.pts = f.pts.map(q => (from === 'E' || from === 'W' ? [q[0] + d, q[1]] : [q[0], q[1] + d])); f.p = p;
+      bump(); map.update(state());
+    },
+    dragHandle(bid, hid, uv, phase) {
+      if (phase !== 'move') log('dragHandle', bid, hid, uv, phase);
+      const b = S.bounds.find(x => x.id === bid); if (!b || phase === 'start') return;
+      const xs = [b.pts[0][0], b.pts[2][0]], ys = [b.pts[0][1], b.pts[2][1]];
+      if (hid === 'move') { const cx = (xs[0] + xs[1]) / 2, cy = (ys[0] + ys[1]) / 2; xs[0] += uv.u - cx; xs[1] += uv.u - cx; ys[0] += uv.v - cy; ys[1] += uv.v - cy; }
+      else { const i = +hid.slice(1); if (i === 0 || i === 3) xs[0] = uv.u; else xs[1] = uv.u; if (i < 2) ys[0] = uv.v; else ys[1] = uv.v; }
+      const u0 = Math.min(xs[0], xs[1]), u1 = Math.max(xs[0], xs[1]), v0 = Math.min(ys[0], ys[1]), v1 = Math.max(ys[0], ys[1]);
+      b.pts = [[u0, v0], [u1, v0], [u1, v1], [u0, v1]];
+      b.handles = [{ id: 'c0', u: u0, v: v0, axis: 'free' }, { id: 'c1', u: u1, v: v0, axis: 'free' }, { id: 'c2', u: u1, v: v1, axis: 'free' }, { id: 'c3', u: u0, v: v1, axis: 'free' }, { id: 'move', u: (u0 + u1) / 2, v: (v0 + v1) / 2, axis: 'free' }];
+      if (S.mask) S.mask.holes = [b.pts];
+      map.update(state());
+    },
+    drawDone(kind, pts) {
+      log('drawDone', kind, pts);
+      const id = 'usr:' + (++rev);
+      if (kind === 'nai') S.isr.push({ id, ref: 'nai:NAI-' + rev, kind: 'nai', pts, closed: true, label: 'NAI-' + rev, state: 'active', cls: '' });
+      else S.features.push({ id, ref: id, kind: kind === 'line' ? 'line' : kind === 'area' ? 'area' : 'note', sub: '', name: kind.toUpperCase() + ' ' + rev, label: kind.toUpperCase() + ' ' + rev, pts, closed: kind === 'area', side: 'N', conf: 1, cls: '' });
+      bump(); map.update(state());
+    },
+    view(v) { $('view').textContent = 'k ' + v.k.toFixed(2); }
+  };
+  const map = window.WGMap.mount($('map'), hooks);
+  window.HX = { map, get state() { return S; } };
+  function load() { S = clone(window.FX[$('fx').value]); rev = 0; map.update(state()); map.fit('all', false); }
+  const LAY = ['red', 'blue', 'isr', 'sync', 'adj', 'method', 'relief', 'grid'];
+  $('layers').innerHTML = LAY.map(k => `<label><input type="checkbox" data-l="${k}" checked> ${k}</label>`).join(' ');
+  $('layers').addEventListener('change', e => { const k = e.target.dataset.l; if (!k) return; S.layers[k] = e.target.checked ? 1 : 0; map.update(state()); });
+  $('fx').addEventListener('change', load);
+  ['edit', 'tool', 'gallery', 'plan'].forEach(id => $(id).addEventListener('change', () => map.update(state())));
+  $('phone').addEventListener('change', e => document.body.classList.toggle('phone', e.target.checked));
+  document.querySelectorAll('[data-theme]').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.theme; if (v === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = v;
+    document.querySelectorAll('[data-theme]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => {
+    document.documentElement.lang = b.dataset.lang;
+    document.querySelectorAll('[data-lang]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const s = S; S = clone(s); S._g = s._g; S.hash = { base: 'l' + Date.now(), cm: 'l' + Date.now() }; map.update(state());
+  }));
+  $('fit').addEventListener('click', () => map.fit('all'));
+  $('zin').addEventListener('click', () => map.zoomBy(1.5));
+  $('zout').addEventListener('click', () => map.zoomBy(1 / 1.5));
+  $('svg').addEventListener('click', () => {
+    const s = map.toSVGString(); log('toSVGString', s.length + ' chars', s.slice(0, 60));
+    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })); a.download = 'plano.svg'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 300); } catch (e) { log('download', 'no disponible'); }
+  });
+  load();
+})();
+</script>
+</body>
+</html>

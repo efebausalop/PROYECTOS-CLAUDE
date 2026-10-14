@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>COA Wargaming Tool</title>
+<title>TACTICAL PLANNING WG SIMULATOR</title>
+<link rel="icon" type="image/png" href="img/sello-32.png">
+<link rel="apple-touch-icon" href="img/sello-192.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +14,8 @@
 </head>
 <body>
 <header id="top">
-  <div class="logo" aria-hidden="true">WG</div>
-  <div class="ttl"><b id="opTitle">COA Wargaming</b><span><span data-i18n="Paso 4 · Análisis de líneas de acción">Paso 4 · Análisis de líneas de acción</span> · <span id="opTag"></span></span></div>
+  <img class="logo" src="img/sello-96.png" alt="Sello del Departamento de Guerra Anfibia" width="40" height="40">
+  <div class="ttl"><b class="brand">TACTICAL PLANNING WG SIMULATOR</b><span><b id="opTitle" class="optl">COA Wargaming</b> · <span data-i18n="Paso 4 · Análisis de líneas de acción">Paso 4 · Análisis de líneas de acción</span> · <span id="opTag"></span></span></div>
   <div class="hdr">
     <select id="opSel" aria-label="Operación activa"></select>
     <select id="roleSel" aria-label="Rol activo"></select>
@@ -22,6 +24,7 @@
     <button class="tbtn" data-a="importOpen" data-i18n-title="Importar una operación o una copia de wargaming_nato v2 (.json)">⬆ <span data-i18n="Importar">Importar</span></button>
     <input type="file" id="imp" accept=".json,application/json" hidden>
     <button class="tbtn" id="printBtn" data-a="print" hidden>🖨 <span data-i18n="Imprimir">Imprimir</span></button>
+    <a class="tbtn" href="docs/Manual_TACTICAL_PLANNING_WG_SIMULATOR.pdf" target="_blank" rel="noopener">📘 <span data-i18n="Manual">Manual</span></a>
     <button class="tbtn" id="asBtn" data-a="assist">✦ <span data-i18n="Asistente">Asistente</span></button>
     <span id="saveState">—</span>
   </div>
